@@ -15,6 +15,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
 import com.xxl.job.core.util.DateUtil;
+import io.micrometer.core.instrument.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * core job action for xxl-job
@@ -70,6 +72,16 @@ public class XxlJobServiceImpl implements XxlJobService {
 		}
 		if (jobInfo.getAuthor()==null || jobInfo.getAuthor().trim().length()==0) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_input")+I18nUtil.getString("jobinfo_field_author")) );
+		}
+
+		if(StringUtils.isNotBlank(jobInfo.getAlarmSms())){
+			Set<String> smsSet = new HashSet<String>(Arrays.asList(jobInfo.getAlarmSms().trim().split(",")));
+			for (String phone : smsSet) {
+				boolean mobilePhone = validateMobilePhone(phone);
+				if(!mobilePhone){
+					return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_phonenumber_unvalid")) );
+				}
+			}
 		}
 
 		// valid trigger
@@ -174,6 +186,16 @@ public class XxlJobServiceImpl implements XxlJobService {
 		}
 		if (jobInfo.getAuthor()==null || jobInfo.getAuthor().trim().length()==0) {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("system_please_input")+I18nUtil.getString("jobinfo_field_author")) );
+		}
+
+		if(StringUtils.isNotBlank(jobInfo.getAlarmSms())){
+			Set<String> smsSet = new HashSet<String>(Arrays.asList(jobInfo.getAlarmSms().trim().split(",")));
+			for (String phone : smsSet) {
+				boolean mobilePhone = validateMobilePhone(phone);
+				if(!mobilePhone){
+					return new ReturnT<String>(ReturnT.FAIL_CODE, (I18nUtil.getString("jobinfo_phonenumber_unvalid")) );
+				}
+			}
 		}
 
 		// valid trigger
@@ -430,6 +452,12 @@ public class XxlJobServiceImpl implements XxlJobService {
 		result.put("triggerCountFailTotal", triggerCountFailTotal);
 
 		return new ReturnT<Map<String, Object>>(result);
+	}
+
+	//校验手机号
+	public static boolean validateMobilePhone(String in) {
+		Pattern pattern = Pattern.compile("^[1]\\d{10}$");
+		return pattern.matcher(in).matches();
 	}
 
 }
