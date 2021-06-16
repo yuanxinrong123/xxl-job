@@ -23,6 +23,13 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>com.submail</groupId>
+			<artifactId>submail.jar</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/submail.jar</systemPath>
+		</dependency>
 		<!-- starter-web：spring-webmvc + autoconfigure + logback + yaml + tomcat -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
